@@ -3,51 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FAF6EF">
+<meta name="theme-color" content="#2B3340">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23D9825B'/%3E%3Cpath d='M16 5a10 10 0 1 1-5.5 18.4L6.5 26 8 21.6A10 10 0 0 1 16 5z' fill='%23FAF6EF'/%3E%3Cpath d='M16 10v5l3.5 2' fill='none' stroke='%232B3340' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232B3340'/%3E%3Crect x='14' y='22' width='72' height='46' rx='23' fill='%23FAF6EF'/%3E%3Cpolygon points='26,64 18,84 46,68' fill='%23FAF6EF'/%3E%3Ccircle cx='34' cy='45' r='5.5' fill='%235E6E42'/%3E%3Ccircle cx='50' cy='45' r='7' fill='%239B784E'/%3E%3Ccircle cx='66.5' cy='45' r='8.5' fill='%23D9825B'/%3E%3C/svg%3E">
 <title>Who's Waiting</title>
 <style>
-:root{--bg:#FAF6EF;--ink:#2B3340;--mute:#667085;--line:#E6DECF;--olive:#5E6E42;--olive-bg:#EDF0E3;--terra:#A9552D;--terra-bg:#F8E4D8;--serif:Georgia,"Noto Serif","Times New Roman",serif}
+:root{--bg:#FAF6EF;--ink:#2B3340;--mute:#667085;--line:#E6DECF;--terra:#A9552D;--tint:#EFEAE0;--serif:Georgia,"Noto Serif","Times New Roman",serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:96px}
 .wrap{max-width:480px;margin:0 auto;padding:0 18px}
-header{display:flex;align-items:center;gap:8px;padding:16px 0 0}
-.brand{display:flex;align-items:center;gap:9px;font:700 19px var(--serif);flex:1}
-.brand svg{display:block}
+.band{background:var(--ink);color:#FAF6EF;border-radius:0 0 24px 24px;padding:calc(12px + env(safe-area-inset-top,0px)) 0 24px}
+.top{display:flex;align-items:center;gap:4px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:500;font-size:17px;flex:1}
+.blink{background:none;border:0;color:#D9D2C3;font-size:14px;padding:8px 0 8px 12px}
+.head{font:400 25px/1.25 var(--serif);margin:16px 0 0}
+.head em{font-style:normal;color:#F0A67F}
 h2{font:700 22px/1.2 var(--serif);margin:0 0 8px}
 h3{font-size:16px;margin:18px 0 2px}
 p{margin:0 0 10px}
 button{font:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--olive);outline-offset:2px}
-.link{background:none;border:0;color:var(--olive);font-weight:600;font-size:15px;padding:8px 0 8px 10px}
-.head{font:400 27px/1.2 var(--serif);margin:22px 0 18px;letter-spacing:-.2px}
-.banner{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--olive-bg);border-radius:10px;padding:4px 12px;margin-bottom:12px;font-size:14px}
-.tabs{display:flex;background:#F1EADC;border-radius:12px;padding:3px;margin-bottom:6px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.link{background:none;border:0;color:var(--ink);font-weight:600;font-size:15px;padding:8px 0 8px 10px;text-decoration:underline}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--tint);border-radius:10px;padding:4px 12px;margin-top:14px;font-size:14px}
+.tabs{display:flex;background:#F1EADC;border-radius:12px;padding:3px;margin:16px 0 2px}
 .tab{flex:1;background:none;border:0;border-radius:9px;padding:9px 4px;color:var(--mute)}
 .tab[aria-selected=true]{background:#FFFCF6;color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line)}
-.item{display:grid;grid-template-columns:68px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
-.tile{height:68px;border-radius:16px;background:var(--olive-bg);color:var(--olive);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-.tile b{font:700 28px/1 var(--serif)}
-.tile b.sm{font-size:20px}
-.tile span{font-size:12px;margin-top:4px;min-height:12px}
-.late .tile{background:var(--terra-bg);color:var(--terra)}
-.name{background:none;border:0;padding:0;font:700 19px/1.2 var(--serif);color:var(--ink);text-align:left}
-.note{margin:3px 0 0}
-.meta{margin:4px 0 10px;font-size:14px;color:var(--mute)}
-.meta.due{color:var(--terra);font-weight:600}
+.row{border-bottom:1px solid var(--line)}
+.main{display:flex;gap:12px;align-items:flex-start;width:100%;background:none;border:0;padding:14px 0;text-align:left;color:inherit}
+.av{flex:none;width:46px;height:46px;border-radius:23px 23px 23px 6px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px}
+.mid{flex:1;min-width:0;display:block}
+.t2{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.nm{font-weight:500;font-size:17px}
+.tm{font-size:14px;font-weight:500;white-space:nowrap}
+.nt{display:block;font-size:15px;color:var(--mute);margin:1px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.open .nt{white-space:normal}
+.bar{display:block;height:5px;border-radius:3px;background:var(--line)}
+.bar i{display:block;height:5px;border-radius:3px}
+.rm{display:block;font-size:13px;color:var(--mute);margin-top:7px}
+.rm.due{color:var(--terra);font-weight:600}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
+.row .acts{padding:0 0 16px 58px}
 .btn{font-size:15px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);min-height:42px}
-.btn.pri{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:600}
-.btn.soft{background:var(--olive-bg);border-color:var(--olive-bg);color:var(--olive);font-weight:600}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:#FAF6EF;font-weight:600}
+.btn.sel{background:var(--ink);border-color:var(--ink);color:#FAF6EF;font-weight:600}
 .empty{text-align:center;color:var(--mute);padding:34px 10px}
 .empty svg{margin-bottom:10px}
 .empty .acts{justify-content:center;margin-top:14px}
-.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px))}
-.bar .btn{display:block;width:100%;max-width:444px;margin:0 auto;font-size:17px;min-height:50px;border-radius:12px}
-.ov{position:fixed;inset:0;background:rgba(43,51,64,.4);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.bar2{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px))}
+.bar2 .btn{display:block;width:100%;max-width:444px;margin:0 auto;font-size:17px;min-height:50px;border-radius:12px}
+.ov{position:fixed;inset:0;background:rgba(43,51,64,.45);display:none;align-items:flex-end;justify-content:center;z-index:5}
 .ov.on{display:flex}
 .sheet{background:var(--bg);width:100%;max-width:480px;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:22px 18px calc(20px + env(safe-area-inset-bottom,0px))}
 .sheet ol{padding-left:20px;margin:0 0 14px}
@@ -64,22 +71,24 @@ input[type=text],input[type=tel]{width:100%}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#D9825B"/><path d="M16 5a10 10 0 1 1-5.5 18.4L6.5 26 8 21.6A10 10 0 0 1 16 5z" fill="#FAF6EF"/><path d="M16 10v5l3.5 2" fill="none" stroke="#2B3340" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Who's Waiting</div>
-    <button class="link" id="settings">Settings</button><button class="link" id="guide">Guide</button>
-  </header>
+<div class="band"><div class="wrap">
+  <div class="top">
+    <div class="brand"><svg width="30" height="30" viewBox="10 18 80 70" aria-hidden="true"><rect x="14" y="22" width="72" height="46" rx="23" fill="#FAF6EF"/><polygon points="26,64 18,84 46,68" fill="#FAF6EF"/><circle cx="34" cy="45" r="5.5" fill="#5E6E42"/><circle cx="50" cy="45" r="7" fill="#9B784E"/><circle cx="66.5" cy="45" r="8.5" fill="#D9825B"/></svg>Who's Waiting</div>
+    <button class="blink" id="settings">Settings</button><button class="blink" id="guide">Guide</button>
+  </div>
   <h1 class="head" id="sum"></h1>
+</div></div>
+<div class="wrap">
   <div id="ban"></div>
   <div class="tabs" id="tabs" role="tablist"></div>
   <div id="list"></div>
 </div>
-<div class="bar"><button class="btn pri" id="add">+ Add a chat</button></div>
+<div class="bar2"><button class="btn pri" id="add">+ Add a chat</button></div>
 <div class="ov" id="ov"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 const KEY='whoswaiting.v2';
-let S={items:[],seen:false,alertMin:60},tab='me',cur=null,mode='',undoFn=null;
+let S={items:[],seen:false,alertMin:60},tab='me',cur=null,mode='',undoFn=null,openId=null;
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -90,25 +99,27 @@ const perm=()=>'Notification' in window?Notification.permission:'none';
 function askPerm(){if(perm()==='default')try{return Notification.requestPermission()}catch(e){}}
 function dur(m){if(m<2)return'a moment';if(m<60)return Math.round(m)+' minutes';const h=Math.floor(m/60);if(h<24)return h+(h==1?' hour':' hours');const d=Math.floor(h/24);return d+(d==1?' day':' days')}
 function fmt(m){if(m>=1440&&m%1440===0){const d=m/1440;return d+(d==1?' day':' days')}if(m>=60&&m%60===0){const h=m/60;return h+(h==1?' hour':' hours')}return m+(m==1?' minute':' minutes')}
-function tm(m){if(m<2)return['now',''];if(m<60)return[Math.round(m),'min'];const h=Math.floor(m/60);if(h<24)return[h,h==1?'hour':'hours'];const d=Math.floor(h/24);return[d,d==1?'day':'days']}
 function dayDiff(ts){const a=new Date();a.setHours(0,0,0,0);const b=new Date(ts);b.setHours(0,0,0,0);return Math.round((b-a)/864e5)}
 function when(ts){const d=dayDiff(ts),t=new Date(ts).toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
   return d===0?'in '+dur((ts-Date.now())/6e4):d===1?'tomorrow at '+t:new Date(ts).toLocaleDateString('en-ZA',d<7?{weekday:'long'}:{day:'numeric',month:'short'})+' at '+t}
 const remindAt=k=>Date.now()+ +k*6e4;
+function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)),A=p(a),B=p(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')}
 function toast(t,u){const e=$('#toast');e.innerHTML=esc(t)+(u?'<button id="undo">Undo</button>':'');undoFn=u||null;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,u?5000:2600)}
+const ini=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 
 /* ---------- lists ---------- */
 function card(i){
-  const me=i.st!=='them',m=(Date.now()-i.since)/6e4,rd=isDue(i),late=rd||m>=(me?1440:4320),[n,u]=tm(m);
-  const meta=rd?(me?'Reminder due now':'Time to check in'):i.remindAt?'Reminder '+when(i.remindAt):me?'Waiting for your reply':'You replied. No answer yet';
-  return`<div class="item${late?' late':''}" data-id="${esc(i.id)}"><div class="tile"><b${typeof n==='string'?' class="sm"':''}>${n}</b><span>${u}</span></div><div><button class="name" data-a="edit" aria-label="Edit ${esc(i.name)}">${esc(i.name)}</button>${i.note?'<p class="note">'+esc(i.note)+'</p>':''}<p class="meta${rd?' due':''}">${meta}</p><div class="acts">${i.num?'<button class="btn soft" data-a="wa">WhatsApp</button>':''}<button class="btn pri" data-a="${me?'replied':'theyreplied'}">${me?'I replied':'They replied'}</button><button class="btn" data-a="remind">Remind me</button><button class="btn" data-a="done">Done</button></div></div></div>`}
+  const me=i.st!=='them',m=(Date.now()-i.since)/6e4,rd=isDue(i),t=rd?1:Math.min(1,m/(me?1440:4320));
+  const bg=mix('#5E6E42','#D9825B',t),fg=t>.55?'#2B3340':'#FAF6EF',tc=mix('#667085','#A9552D',t),open=openId===i.id;
+  const rm=rd?'<span class="rm due">'+(me?'Reminder due now':'Time to check in')+'</span>':i.remindAt?'<span class="rm">Reminder '+when(i.remindAt)+'</span>':!me?'<span class="rm">You replied. No answer yet</span>':'';
+  return`<div class="row${open?' open':''}" data-id="${esc(i.id)}"><button class="main" data-a="toggle" aria-expanded="${open}"><span class="av" style="background:${bg};color:${fg}">${esc(ini(i.name))}</span><span class="mid"><span class="t2"><span class="nm">${esc(i.name)}</span><span class="tm" style="color:${tc}">${m<2?'just now':dur(m)}</span></span><span class="nt">${esc(i.note||'')}</span><span class="bar"><i style="width:${Math.max(5,Math.round(t*100))}%;background:${bg}"></i></span>${rm}</span></button>${open?`<div class="acts">${i.num?'<button class="btn" data-a="wa">WhatsApp</button>':''}<button class="btn pri" data-a="${me?'replied':'theyreplied'}">${me?'I replied':'They replied'}</button><button class="btn" data-a="remind">Remind me</button><button class="btn" data-a="edit">Edit</button><button class="btn" data-a="done">Done</button></div>`:''}</div>`}
 
-const HOURGLASS='<svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="#5E6E42" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8h24M16 48h24M18 8c0 12 8 14 10 20-2 6-10 8-10 20M38 8c0 12-8 14-10 20 2 6 10 8 10 20"/><path d="M23 42c3-2 7-2 10 0" stroke="#D9825B"/></svg>';
+const HOURGLASS='<svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="#2B3340" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8h24M16 48h24M18 8c0 12 8 14 10 20-2 6-10 8-10 20M38 8c0 12-8 14-10 20 2 6 10 8 10 20"/><path d="M23 42c3-2 7-2 10 0" stroke="#D9825B"/></svg>';
 
 function render(){
   const by=(a,b)=>(isDue(b)?1:0)-(isDue(a)?1:0)||a.since-b.since;
-  const me=S.items.filter(i=>i.st!=='them').sort(by),th=S.items.filter(i=>i.st==='them').sort(by),d=S.items.filter(isDue).length;
-  $('#sum').textContent=S.items.length?(me.length?me.length+(me.length==1?' customer is':' customers are')+' waiting for your reply.':'No one is waiting on you.')+(d?' '+d+(d==1?' reminder is':' reminders are')+' due.':''):'Nobody is waiting.';
+  const me=S.items.filter(i=>i.st!=='them').sort(by),th=S.items.filter(i=>i.st==='them').sort(by),d=S.items.filter(isDue).length,em=n=>'<em>'+n+'</em>';
+  $('#sum').innerHTML=S.items.length?(me.length?em(me.length)+(me.length==1?' customer is':' customers are')+' waiting for your reply.':'No one is waiting on you.')+(d?' '+em(d)+(d==1?' reminder is':' reminders are')+' due.':''):'Nobody is waiting.';
   $('#ban').innerHTML=S.items.some(i=>i.sample)?'<div class="banner"><span>These are examples.</span><button class="link" data-a="clear">Clear examples</button></div>':'';
   $('#tabs').innerHTML=[['me','Your turn',me.length],['them','Their turn',th.length]].map(([k,l,n])=>`<button class="tab" role="tab" aria-selected="${tab===k}" data-tab="${k}">${l}${n?' ('+n+')':''}</button>`).join('');
   const L=tab==='me'?me:th;
@@ -145,19 +156,19 @@ const close=()=>ov.classList.remove('on');
 const CLOSE='<button class="btn" data-s="close">Close</button>';
 const picker=p=>`<div class="custom"><input type="number" id="${p}-n" inputmode="numeric" min="1" placeholder="e.g. 45" aria-label="Amount"><select id="${p}-u" aria-label="Unit"><option value="1">minutes</option><option value="60" selected>hours</option><option value="1440">days</option></select><button class="btn pri" data-c="${p}">Set</button></div>`;
 
-function welcome(){S.seen=true;save();sheet('<h2>Welcome</h2><p>See who is waiting on you, and who you are waiting on.</p><ol><li>Tap <b>Add a chat</b> when a customer needs a reply, or when you are waiting to hear back.</li><li>You get a nudge when someone has waited an hour. You can change this in <b>Settings</b>, or tap <b>Remind me</b> to pick your own time.</li><li>Reply on WhatsApp, tap <b>I replied</b>, and tap <b>Done</b> when the chat is finished.</li></ol><div class="acts"><button class="btn pri" data-s="examples">See it with examples</button><button class="btn" data-s="close">Start empty</button></div>')}
+function welcome(){S.seen=true;save();sheet('<h2>Welcome</h2><p>See who is waiting on you, and who you are waiting on.</p><ol><li>Tap <b>Add a chat</b> when a customer needs a reply, or when you are waiting to hear back.</li><li>Tap a customer to see what you can do. You get a nudge when someone has waited an hour, and you can change that in <b>Settings</b>.</li><li>Reply on WhatsApp, tap <b>I replied</b>, and tap <b>Done</b> when the chat is finished.</li></ol><div class="acts"><button class="btn pri" data-s="examples">See it with examples</button><button class="btn" data-s="close">Start empty</button></div>')}
 
 function guide(){sheet(`<h2>How it works</h2>
-<h3>Your turn</h3><p>Customers waiting for you to reply. The longest wait is at the top. The time tile turns peach after a day.</p>
+<h3>Your turn</h3><p>Customers waiting for you to reply. The longest wait is at the top. As the wait grows, the colour moves from green towards terracotta.</p>
 <h3>Their turn</h3><p>Customers you have replied to, like after sending a quote. You can see who has gone quiet, so you can chase them before the sale is lost.</p>
-<h3>I replied and They replied</h3><p>Tap I replied after you answer a customer. They move to Their turn and you can set a reminder to follow up. When they answer, tap They replied and they move back to Your turn.</p>
-<h3>Alerts and reminders</h3><p>In Settings, choose how long a customer can wait before you get a notification. Remind me sets your own reminder for one customer. You can pick any time, in minutes, hours or days.</p>
-<h3>WhatsApp and Done</h3><p>If you saved a number, WhatsApp opens their chat. Done removes the customer from the list. If you tap it by mistake, tap Undo straight away.</p>
-<h3>Good to know</h3><p>Everything stays on this phone. There is no account or subscription, and the list works without internet. Notifications buzz while the app is open or still running in the background. If your phone has closed the app, the list shows who has been waiting when you open it. Tap a name to edit it. To keep the app on your home screen, open your browser menu and tap Add to Home screen. Clearing your browser data erases your list.</p>
+<h3>Tap a customer</h3><p>Tap any row to open its buttons. I replied moves a customer to Their turn and lets you set a reminder. They replied moves them back to Your turn.</p>
+<h3>Alerts and reminders</h3><p>In Settings, choose how long a customer can wait before you get a notification. Remind me sets your own reminder for one customer, in any number of minutes, hours or days.</p>
+<h3>WhatsApp, Edit and Done</h3><p>If you saved a number, WhatsApp opens their chat. Edit changes their details. Done removes the customer from the list. If you tap it by mistake, tap Undo straight away.</p>
+<h3>Good to know</h3><p>Everything stays on this phone. There is no account or subscription, and the list works without internet. Notifications buzz while the app is open or still running in the background. If your phone has closed the app, the list shows who has been waiting when you open it. To keep the app on your home screen, open your browser menu and tap Install app. Clearing your browser data erases your list.</p>
 <div class="acts" style="margin-top:14px">${CLOSE}</div>`)}
 
 function settings(){
-  const a=S.alertMin,p=perm(),o=(v,l)=>`<button class="btn${a===v?' soft':''}" data-al="${v}">${l}</button>`;
+  const a=S.alertMin,p=perm(),o=(v,l)=>`<button class="btn${a===v?' sel':''}" data-al="${v}">${l}</button>`;
   sheet(`<h2>Settings</h2><h3>Alert me when someone is waiting</h3><p class="hint" style="margin-top:0">You get a notification once a customer has waited this long for your reply. Right now: <b>${a?fmt(a):'off'}</b>.</p><div class="opts" style="grid-template-columns:repeat(3,1fr)">${o(0,'Off')}${o(60,'1 hour')}${o(120,'2 hours')}</div><span class="lbl">Or choose your own</span>${picker('a')}
 <h3>Notifications</h3><p class="hint" style="margin-top:0">${p==='granted'?'Allowed.':p==='default'?'Not allowed yet.':p==='denied'?'Blocked. Turn them on in your browser settings for this site.':'Not supported on this browser.'}</p>${p==='default'?'<button class="btn pri" data-s="perm">Allow notifications</button>':''}
 <div class="acts" style="margin-top:16px">${CLOSE}</div>`)}
@@ -202,16 +213,17 @@ function examples(){
   S.items=S.items.filter(i=>!i.sample).concat([
    {id:'s1',name:'Thandi',note:'Asked for a price on 20 cupcakes',st:'me',since:n-26*h,alerted:true,sample:1},
    {id:'s2',name:'Mr Adams',note:'Wants a plumber on Friday morning',st:'me',since:n-2*h,alerted:true,sample:1},
+   {id:'s5',name:'Naledi',note:'Can you do Saturday for a haircut?',st:'me',since:n-8*h,alerted:true,sample:1},
    {id:'s3',name:'Lauren',note:'Sent the quote for the garden clean-up',st:'them',since:n-72*h,remindAt:n-6e5,sample:1},
    {id:'s4',name:'Sipho',note:'Sent the price list, thinking it over',st:'them',since:n-5*h,remindAt:remindAt(2880),sample:1}]);
-  tab='me';save();arm();render()}
+  tab='me';openId=null;save();arm();render()}
 
 /* ---------- events ---------- */
 document.body.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
   if(t.id==='undo'){if(undoFn)undoFn();undoFn=null;$('#toast').hidden=true;return}
-  if(d.tab){tab=d.tab;render();return}
+  if(d.tab){tab=d.tab;openId=null;render();return}
   if(d.s==='close')return close();
   if(d.s==='save')return saveForm();
   if(d.s==='examples'){close();return examples()}
@@ -228,15 +240,16 @@ document.body.addEventListener('click',e=>{
   const a=d.a;if(!a)return;
   if(a==='new')return form();
   if(a==='examples')return examples();
-  if(a==='clear'){S.items=S.items.filter(i=>!i.sample);save();arm();return render()}
-  const box=t.closest('.item'),id=box&&box.dataset.id,it=find(id);
+  if(a==='clear'){S.items=S.items.filter(i=>!i.sample);openId=null;save();arm();return render()}
+  const box=t.closest('.row'),id=box&&box.dataset.id,it=find(id);
   if(!it)return;
+  if(a==='toggle'){openId=openId===id?null:id;return render()}
   if(a==='edit')return form(id);
   if(a==='remind')return remind(id);
   if(a==='replied')return remind(id,'replied');
-  if(a==='theyreplied'){it.st='me';it.since=Date.now();delete it.remindAt;delete it.alerted;tab='me';save();arm();render();return toast('Moved to Your turn')}
+  if(a==='theyreplied'){it.st='me';it.since=Date.now();delete it.remindAt;delete it.alerted;tab='me';openId=null;save();arm();render();return toast('Moved to Your turn')}
   if(a==='wa'){let n=(it.num||'').replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);else if(n.startsWith('0'))n='27'+n.slice(1);window.open('https://wa.me/'+n,'_blank');return}
-  if(a==='done'){const at=S.items.indexOf(it);S.items.splice(at,1);save();arm();render();
+  if(a==='done'){const at=S.items.indexOf(it);S.items.splice(at,1);openId=null;save();arm();render();
     toast(it.name+' is done',()=>{S.items.splice(Math.min(at,S.items.length),0,it);save();arm();render()})}});
 ov.addEventListener('click',e=>{if(e.target===ov)close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
