@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EF">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%235E6E42'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23FAF6EF' stroke-width='3'/%3E%3C/svg%3E">
+<title>Who's Waiting</title>
+<style>
+:root{--bg:#FAF6EF;--card:#FFFDF9;--ink:#2B3340;--mute:#667085;--line:#E6DECF;--olive:#5E6E42;--olive-bg:#EDF0E3;--peach:#B8643A}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:96px}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 4px}
+h1{font-size:21px;margin:0;font-weight:700}
+h2{font-size:19px;margin:0 0 8px}
+h3{font-size:16px;margin:16px 0 2px}
+p{margin:0 0 10px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--olive);outline-offset:2px}
+.link{background:none;border:0;color:var(--olive);font-weight:600;padding:8px 0 8px 12px}
+.sum{margin:2px 0 14px;color:var(--mute)}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--olive-bg);border-radius:8px;padding:6px 12px;margin-bottom:12px;font-size:14px}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:12px}
+.tab{flex:1;background:none;border:0;border-bottom:3px solid transparent;padding:10px 4px;color:var(--mute)}
+.tab[aria-selected=true]{color:var(--ink);font-weight:600;border-color:var(--olive)}
+.item{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.item.late{border-left-color:var(--peach)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.name{background:none;border:0;padding:0;font-weight:650;font-size:17px;color:var(--ink);text-align:left}
+.when{font-size:14px;color:var(--mute);text-align:right}
+.late .when{color:var(--peach);font-weight:600}
+.note{margin:2px 0 8px}
+.rem{margin:0 0 10px;font-size:14px;color:var(--mute)}
+.rem.due{color:var(--peach);font-weight:600}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font-size:15px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);min-height:42px}
+.btn.pri{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:600}
+.btn.soft{background:var(--olive-bg);border-color:var(--olive-bg);color:var(--olive);font-weight:600}
+.empty{text-align:center;color:var(--mute);padding:28px 8px}
+.empty .acts{justify-content:center;margin-top:14px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.bar .btn{display:block;width:100%;max-width:448px;margin:0 auto;font-size:17px;min-height:48px}
+.ov{position:fixed;inset:0;background:rgba(43,51,64,.4);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.ov.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:480px;max-height:90vh;overflow:auto;border-radius:16px 16px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet ol{padding-left:20px;margin:0 0 14px}
+.sheet li{margin-bottom:6px}
+.lbl{display:block;font-size:14px;color:var(--mute);margin:14px 0 4px}
+.hint{font-size:14px;color:var(--mute);margin:12px 0 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+input[type=text],input[type=tel]{width:100%;font:inherit;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.chips{display:flex;gap:8px}
+.chip{flex:1;position:relative}
+.chip input{position:absolute;opacity:0}
+.chip span{display:block;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.chip input:checked+span{background:var(--olive-bg);border-color:var(--olive);color:var(--olive);font-weight:600}
+.chip input:focus-visible+span{outline:2px solid var(--olive);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:9;max-width:90%}
+.toast button{background:none;border:0;color:#F3C7AC;font-weight:600;text-decoration:underline;padding:0 0 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>Who's Waiting</h1><button class="link" id="guide">Guide</button></header>
+  <p class="sum" id="sum"></p>
+  <div id="ban"></div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="list"></div>
+</div>
+<div class="bar"><button class="btn pri" id="add">Add a chat</button></div>
+<div class="ov" id="ov"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden></div>
+<script>
+const KEY='whoswaiting.v2';
+let S={items:[],seen:false},tab='me',cur=null,mode='',undoFn=null;
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const find=id=>S.items.find(x=>x.id===id);
+const isDue=i=>i.remindAt&&i.remindAt<=Date.now();
+function dur(m){if(m<2)return'a moment';if(m<60)return Math.round(m)+' minutes';const h=Math.floor(m/60);if(h<24)return h+(h==1?' hour':' hours');const d=Math.floor(h/24);return d+(d==1?' day':' days')}
+function dayDiff(ts){const a=new Date();a.setHours(0,0,0,0);const b=new Date(ts);b.setHours(0,0,0,0);return Math.round((b-a)/864e5)}
+function when(ts){const d=dayDiff(ts),t=new Date(ts).toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+  return d===0?'in '+dur((ts-Date.now())/6e4):d===1?'tomorrow at '+t:new Date(ts).toLocaleDateString('en-ZA',d<7?{weekday:'long'}:{day:'numeric',month:'short'})+' at '+t}
+function remindAt(k){if(k==='tom')k='d1';if(k[0]==='d'){const x=new Date();x.setDate(x.getDate()+ +k.slice(1));x.setHours(8,0,0,0);return x.getTime()}return Date.now()+ +k*6e4}
+function toast(t,u){const e=$('#toast');e.innerHTML=esc(t)+(u?'<button id="undo">Undo</button>':'');undoFn=u||null;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,u?5000:2200)}
+
+/* ---------- lists ---------- */
+function card(i){
+  const me=i.st!=='them',m=(Date.now()-i.since)/6e4,rd=isDue(i),late=rd||m>=(me?1440:4320);
+  const w=me?(m<2?'Just added':'Waiting '+dur(m)):(m<2?'You just replied':'You replied '+dur(m)+' ago');
+  const rem=rd?'<p class="rem due">'+(me?'Reminder due now':'Time to check in')+'</p>':i.remindAt?'<p class="rem">Reminder '+when(i.remindAt)+'</p>':'<div style="height:6px"></div>';
+  return`<div class="item${late?' late':''}" data-id="${esc(i.id)}"><div class="row"><button class="name" data-a="edit" aria-label="Edit ${esc(i.name)}">${esc(i.name)}</button><span class="when">${w}</span></div>${i.note?'<p class="note">'+esc(i.note)+'</p>':''}${rem}<div class="acts">${i.num?'<button class="btn soft" data-a="wa">WhatsApp</button>':''}<button class="btn pri" data-a="${me?'replied':'theyreplied'}">${me?'I replied':'They replied'}</button><button class="btn" data-a="remind">Remind me</button><button class="btn" data-a="done">Done</button></div></div>`}
+
+function render(){
+  const by=(a,b)=>(isDue(b)?1:0)-(isDue(a)?1:0)||a.since-b.since;
+  const me=S.items.filter(i=>i.st!=='them').sort(by),th=S.items.filter(i=>i.st==='them').sort(by),d=S.items.filter(isDue).length;
+  $('#sum').textContent=S.items.length?(me.length?me.length+(me.length==1?' customer is':' customers are')+' waiting for your reply.':'No one is waiting on you.')+(d?' '+d+(d==1?' reminder is':' reminders are')+' due.':''):'Nobody is waiting.';
+  $('#ban').innerHTML=S.items.some(i=>i.sample)?'<div class="banner"><span>These are examples.</span><button class="link" data-a="clear">Clear examples</button></div>':'';
+  $('#tabs').innerHTML=[['me','Your turn',me.length],['them','Their turn',th.length]].map(([k,l,n])=>`<button class="tab" role="tab" aria-selected="${tab===k}" data-tab="${k}">${l}${n?' ('+n+')':''}</button>`).join('');
+  const L=tab==='me'?me:th;
+  $('#list').innerHTML=!S.items.length?'<div class="empty"><p>Add a customer you owe a reply, or one you are waiting to hear back from. They stay here until you tap Done.</p><div class="acts"><button class="btn pri" data-a="new">Add your first chat</button><button class="btn" data-a="examples">See it with examples</button></div></div>'
+   :!L.length?'<div class="empty">'+(tab==='me'?'No one is waiting on you.':'Nobody to chase right now. After you reply to a quote or enquiry, tap "I replied" to be reminded.')+'</div>':L.map(card).join('')}
+
+/* ---------- reminders ---------- */
+const T={};
+function arm(){Object.keys(T).forEach(k=>{clearTimeout(T[k]);delete T[k]});
+  S.items.forEach(i=>{const ms=i.remindAt-Date.now();if(ms>0&&ms<2e9)T[i.id]=setTimeout(()=>ring(i.id),ms)})}
+function ring(id){const i=find(id);if(!i||!isDue(i))return;render();notify(i)}
+function notify(i){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const me=i.st!=='them',m=(Date.now()-i.since)/6e4,t=(me?'Reply to ':'Check in with ')+i.name;
+  const o={body:(me?'Waiting ':'You replied ')+dur(m)+(me?'':' ago')+(i.note?': '+i.note:''),tag:i.id};
+  const fb=()=>{try{new Notification(t,o)}catch(e){}};
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(r=>r?r.showNotification(t,o):fb()).catch(fb);else fb()}
+const perm=()=>'Notification' in window?Notification.permission:'none';
+
+/* ---------- sheets ---------- */
+const ov=$('#ov'),sh=$('#sheet');
+const sheet=h=>{sh.innerHTML=h;ov.classList.add('on');sh.scrollTop=0};
+const close=()=>ov.classList.remove('on');
+const CLOSE='<button class="btn" data-s="close">Close</button>';
+
+function welcome(){S.seen=true;save();sheet('<h2>Welcome</h2><p>See who is waiting on you, and who you are waiting on.</p><ol><li>Tap <b>Add a chat</b> when a customer needs a reply, or when you are waiting to hear back.</li><li>Check <b>Your turn</b> and reply on WhatsApp. Then tap <b>I replied</b> and pick when to follow up.</li><li>Tap <b>Done</b> when the chat is finished.</li></ol><div class="acts"><button class="btn pri" data-s="examples">See it with examples</button><button class="btn" data-s="close">Start empty</button></div>')}
+
+function guide(){sheet(`<h2>How it works</h2>
+<h3>Your turn</h3><p>Customers waiting for you to reply. The longest wait is at the top. It turns peach after a day.</p>
+<h3>Their turn</h3><p>Customers you have replied to, like after sending a quote. Here you can see who has gone quiet, so you can chase them before the sale is lost.</p>
+<h3>I replied and They replied</h3><p>Tap I replied after you answer a customer. They move to Their turn and you can set a reminder to follow up. When they answer, tap They replied and they move back to Your turn.</p>
+<h3>Remind me</h3><p>Pick a time and you get a notification to go and reply or follow up.</p>
+<h3>WhatsApp and Done</h3><p>If you saved a number, WhatsApp opens their chat. Done removes the customer from the list. If you tap it by mistake, tap Undo straight away.</p>
+<h3>Good to know</h3><p>Everything stays on this phone. There is no account or subscription, and the list works without internet. Notifications buzz while the app is open or still running in the background. If your phone has closed the app, the reminder will be waiting at the top of your list when you open it. Tap a name to edit it. To keep the app on your home screen, open your browser menu and tap Add to Home screen. Clearing your browser data erases your list.</p>
+<div class="acts" style="margin-top:14px">${CLOSE}</div>`)}
+
+function form(id){
+  const it=find(id)||{};cur=id||null;
+  const num=it.num?'<label class="lbl" for="f-num">WhatsApp number</label><input type="tel" id="f-num" inputmode="tel" placeholder="082 123 4567" value="'+esc(it.num)+'">':'<button class="link" data-s="num" style="padding-left:0;margin-top:8px">+ Add WhatsApp number</button>';
+  sheet(`<h2>${id?'Edit chat':'Add a chat'}</h2>${id?'':'<p class="hint" style="margin:0">Goes in '+(tab==='me'?'Your turn':'Their turn')+'.</p>'}
+<label class="lbl" for="f-name">Customer name</label><input type="text" id="f-name" autocomplete="off" value="${esc(it.name)}">
+<label class="lbl" for="f-note">What did they ask? (optional)</label><input type="text" id="f-note" autocomplete="off" placeholder="For example: price for 20 cupcakes" value="${esc(it.note)}">
+<div>${num}</div>
+<div class="acts" style="margin-top:20px"><button class="btn pri" data-s="save">Save</button><button class="btn" data-s="close">Cancel</button></div>`);
+  if(!id)setTimeout(()=>$('#f-name').focus(),50)}
+
+function saveForm(){
+  const name=$('#f-name').value.trim();
+  if(!name){toast("Add the customer's name");$('#f-name').focus();return}
+  const turn=cur&&find(cur)?(find(cur).st||'me'):tab;
+  let it=cur&&find(cur);
+  if(!it){it={id:Date.now().toString(36),since:Date.now()};S.items.push(it)}
+  it.name=name;it.note=$('#f-note').value.trim();it.num=$('#f-num')?$('#f-num').value.trim():(it.num||'');delete it.sample;
+  if((it.st||'me')!==turn){it.since=Date.now();if(turn==='me')delete it.remindAt}
+  it.st=turn;tab=turn;save();arm();close();render();toast('Saved')}
+
+function remind(id,m){
+  const it=find(id);cur=id;mode=m||'';const p=perm(),rep=mode==='replied';
+  const hint=p==='granted'?'You will get a notification. Leave the app open in the background for the best chance of a buzz.':p==='default'?'Your phone will ask to allow notifications the first time.':'Notifications are off for this app, so you will see the reminder when you open it.';
+  sheet(`<h2>${rep?'Follow up with '+esc(it.name)+'?':'Remind me about '+esc(it.name)}</h2>${rep?'<p>They will move to Their turn. Pick when to be reminded if they go quiet.</p>':''}<div class="opts"><button class="btn pri" data-r="30">In 30 minutes</button><button class="btn pri" data-r="60">In 1 hour</button><button class="btn pri" data-r="180">In 3 hours</button><button class="btn pri" data-r="tom">Tomorrow morning</button><button class="btn pri" data-r="d2">In 2 days</button><button class="btn pri" data-r="d7">In a week</button></div><p class="hint">${hint}</p><div class="acts" style="margin-top:14px">${rep?'<button class="btn" data-r="none">No reminder</button>':it.remindAt?'<button class="btn" data-r="clear">Clear reminder</button>':''}${CLOSE}</div>`)}
+
+function setRemind(k){
+  const it=find(cur);if(!it)return;const rep=mode==='replied';
+  if(rep){it.st='them';it.since=Date.now();tab='them'}
+  if(k==='clear'||k==='none')delete it.remindAt;
+  else{it.remindAt=remindAt(k);if(perm()==='default')try{Notification.requestPermission()}catch(e){}}
+  save();arm();close();render();toast(rep?'Moved to Their turn':k==='clear'?'Reminder cleared':'Reminder set')}
+
+function examples(){
+  const n=Date.now(),h=36e5;
+  S.items=S.items.filter(i=>!i.sample).concat([
+   {id:'s1',name:'Thandi',note:'Asked for a price on 20 cupcakes',st:'me',since:n-26*h,sample:1},
+   {id:'s2',name:'Mr Adams',note:'Wants a plumber on Friday morning',st:'me',since:n-2*h,remindAt:n+2*h,sample:1},
+   {id:'s3',name:'Lauren',note:'Sent the quote for the garden clean-up',st:'them',since:n-72*h,remindAt:n-6e5,sample:1},
+   {id:'s4',name:'Sipho',note:'Sent the price list, thinking it over',st:'them',since:n-5*h,remindAt:remindAt('d2'),sample:1}]);
+  tab='me';save();arm();render()}
+
+/* ---------- events ---------- */
+document.body.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  const d=t.dataset;
+  if(t.id==='undo'){if(undoFn)undoFn();undoFn=null;$('#toast').hidden=true;return}
+  if(d.tab){tab=d.tab;render();return}
+  if(d.s==='close')return close();
+  if(d.s==='save')return saveForm();
+  if(d.s==='examples'){close();return examples()}
+  if(d.s==='num'){t.outerHTML='<label class="lbl" for="f-num">WhatsApp number</label><input type="tel" id="f-num" inputmode="tel" placeholder="082 123 4567">';setTimeout(()=>$('#f-num').focus(),0);return}
+  if(d.r)return setRemind(d.r);
+  if(t.id==='guide')return guide();
+  if(t.id==='add')return form();
+  const a=d.a;if(!a)return;
+  if(a==='new')return form();
+  if(a==='examples')return examples();
+  if(a==='clear'){S.items=S.items.filter(i=>!i.sample);save();arm();return render()}
+  const box=t.closest('.item'),id=box&&box.dataset.id,it=find(id);
+  if(!it)return;
+  if(a==='edit')return form(id);
+  if(a==='remind')return remind(id);
+  if(a==='replied')return remind(id,'replied');
+  if(a==='theyreplied'){it.st='me';it.since=Date.now();delete it.remindAt;tab='me';save();arm();render();return toast('Moved to Your turn')}
+  if(a==='wa'){let n=(it.num||'').replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);else if(n.startsWith('0'))n='27'+n.slice(1);window.open('https://wa.me/'+n,'_blank');return}
+  if(a==='done'){const at=S.items.indexOf(it);S.items.splice(at,1);save();arm();render();
+    toast(it.name+' is done',()=>{S.items.splice(Math.min(at,S.items.length),0,it);save();arm();render()})}});
+ov.addEventListener('click',e=>{if(e.target===ov)close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){arm();render()}});
+setInterval(render,6e4);
+render();arm();
+if(!S.seen)welcome();
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+</script>
+</body>
+</html>
