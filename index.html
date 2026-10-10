@@ -140,14 +140,74 @@ function ring(id,kind){
   const i=find(id);if(!i)return;
   if(kind==='a'){if(i.st==='them'||i.alerted||i.remindAt||!S.alertMin)return;i.alerted=true;save()}
   else if(!isDue(i))return;
+  if(kind==='r'){i.rungAt=i.remindAt;save()}
   render();
-  const me=i.st!=='them',m=(Date.now()-i.since)/6e4;
-  const title=me?i.name+' has been waiting '+dur(m):'Check in with '+i.name;
-  if(document.visibilityState==='visible')return toast(title);
-  if(!('Notification' in window)||Notification.permission!=='granted')return;
-  const o={body:me?(i.note||'Time to reply'):'You replied '+dur(m)+' ago'+(i.note?': '+i.note:''),tag:i.id};
-  const fb=()=>{try{new Notification(title,o)}catch(e){}};
-  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(r=>r?r.showNotification(title,o):fb()).catch(fb);else fb()}
+  const p=compose(i,kind);
+  if(document.visibilityState==='visible')return toast(p.title);
+  show(p)}
+
+/* ---------- notifications ---------- */
+const BADGE='badge-96.png',ICON='icon-192.png';
+// Wording follows the real data: "waiting" is always counted from when the chat started waiting (since),
+// and a reminder's own lateness is counted from when it was due (remindAt). The two are never mixed up.
+function compose(i,kind){
+  const now=Date.now(),me=i.st!=='them',w=dur((now-i.since)/6e4),note=i.note||'';
+  const state=me?'Waiting '+w+' for your reply.':'You replied '+w+' ago and haven\u2019t heard back.';
+  let title,body;
+  if(kind==='r'&&i.remindAt&&now-i.remindAt>9e5){
+    title='This one needs a nudge';
+    body=i.name+': your reminder was due '+dur((now-i.remindAt)/6e4)+' ago.'+(note?'\n'+note:'')+'\n'+state}
+  else if(kind==='a'){
+    title='Your turn: '+i.name;
+    body=(note?note+'\n':'')+state}
+  else if(me){
+    title='A reminder from you';
+    body='Reply to '+i.name+'.'+(note?'\n'+note:'')+'\n'+state}
+  else{
+    title='Waiting on '+i.name;
+    body='Time to follow up.'+(note?'\n'+note:'')+'\n'+state}
+  return{title:title,body:body,id:i.id,kind:kind}}
+
+function show(p){
+  if(!('Notification' in window)||Notification.permission!=='granted')return Promise.resolve();
+  const o={body:p.body,tag:p.id,renotify:false,icon:ICON,badge:BADGE,timestamp:Date.now(),vibrate:[120,60,120],data:{id:p.id,kind:p.kind},
+    actions:[{action:'done',title:'Mark done'},{action:'view',title:'View follow-up'}]};
+  const fb=()=>{try{delete o.actions;new Notification(p.title,o)}catch(e){}};
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)return navigator.serviceWorker.getRegistration().then(r=>r?r.showNotification(p.title,o):fb()).catch(fb);
+  fb();return Promise.resolve()}
+
+function clearNote(id){try{navigator.serviceWorker.getRegistration().then(r=>r&&r.getNotifications({tag:id}).then(l=>l.forEach(n=>n.close()))).catch(()=>{})}catch(e){}}
+
+function finish(it){
+  const at=S.items.indexOf(it);S.items.splice(at,1);openId=null;save();arm();render();clearNote(it.id);
+  toast(it.name+' is done',()=>{S.items.splice(Math.min(at,S.items.length),0,it);save();arm();render()})}
+
+function openFromNote(id){
+  if(id==='test')return toast('Test works. Tapping a notification opens the app.');
+  const it=find(id);
+  if(!it)return toast('That follow-up has already been cleared.');
+  tab=it.st==='them'?'them':'me';openId=id;close();render();clearNote(id);
+  setTimeout(()=>{const r=document.querySelector('.row[data-id="'+id+'"]');if(r&&r.scrollIntoView)r.scrollIntoView({block:'center'})},60)}
+function doneFromNote(id){
+  if(id==='test')return toast('Test works. Mark done would clear this follow-up.');
+  const it=find(id);
+  if(!it)return toast('That follow-up has already been cleared.');
+  finish(it)}
+
+// When the app opens after reminders or alerts came due while it was closed, say so once.
+function awayCheck(){
+  const now=Date.now(),last=S.lastOpen;let n=0;
+  if(last)S.items.forEach(i=>{
+    if(i.remindAt){if(i.remindAt<=now&&i.remindAt>last&&i.rungAt!==i.remindAt)n++}
+    else if(i.st!=='them'&&!i.alerted&&S.alertMin&&i.since+S.alertMin*6e4<=now)n++});
+  S.lastOpen=now;save();
+  if(n)toast(n+(n==1?' follow-up came due':' follow-ups came due')+' while you were away.')}
+
+function testNote(kind){
+  if(perm()!=='granted')return toast('Allow notifications first');
+  const p={title:'Your turn: Test customer',body:'This is how a Who\u2019s Waiting notification looks.\nWaiting 2 hours for your reply.',id:'test',kind:'a'};
+  if(kind==='now')show(p).then(()=>toast('Sent. Pull down your notifications.'));
+  else{toast('Test due in 1 minute. Close the app and wait.');setTimeout(()=>show(p),6e4)}}
 
 /* ---------- sheets ---------- */
 const ov=$('#ov'),sh=$('#sheet');
@@ -162,7 +222,7 @@ function guide(){sheet(`<h2>How it works</h2>
 <h3>Your turn</h3><p>Customers waiting for you to reply. The longest wait is at the top. As the wait grows, the colour moves from green towards terracotta.</p>
 <h3>Their turn</h3><p>Customers you have replied to, like after sending a quote. You can see who has gone quiet, so you can chase them before the sale is lost.</p>
 <h3>Tap a customer</h3><p>Tap any row to open its buttons. I replied moves a customer to Their turn and lets you set a reminder. They replied moves them back to Your turn.</p>
-<h3>Alerts and reminders</h3><p>In Settings, choose how long a customer can wait before you get a notification. Remind me sets your own reminder for one customer, in any number of minutes, hours or days.</p>
+<h3>Alerts and reminders</h3><p>In Settings, choose how long a customer can wait before you get a notification. Remind me sets your own reminder for one customer, in any number of minutes, hours or days. Notifications have two buttons: Mark done, and View follow-up, which opens that customer.</p>
 <h3>WhatsApp, Edit and Done</h3><p>If you saved a number, WhatsApp opens their chat. Edit changes their details. Done removes the customer from the list. If you tap it by mistake, tap Undo straight away.</p>
 <h3>Good to know</h3><p>Everything stays on this phone. There is no account or subscription, and the list works without internet. Notifications buzz while the app is open or still running in the background. If your phone has closed the app, the list shows who has been waiting when you open it. To keep the app on your home screen, open your browser menu and tap Install app. Clearing your browser data erases your list.</p>
 <div class="acts" style="margin-top:14px">${CLOSE}</div>`)}
@@ -170,7 +230,7 @@ function guide(){sheet(`<h2>How it works</h2>
 function settings(){
   const a=S.alertMin,p=perm(),o=(v,l)=>`<button class="btn${a===v?' sel':''}" data-al="${v}">${l}</button>`;
   sheet(`<h2>Settings</h2><h3>Alert me when someone is waiting</h3><p class="hint" style="margin-top:0">You get a notification once a customer has waited this long for your reply. Right now: <b>${a?fmt(a):'off'}</b>.</p><div class="opts" style="grid-template-columns:repeat(3,1fr)">${o(0,'Off')}${o(60,'1 hour')}${o(120,'2 hours')}</div><span class="lbl">Or choose your own</span>${picker('a')}
-<h3>Notifications</h3><p class="hint" style="margin-top:0">${p==='granted'?'Allowed.':p==='default'?'Not allowed yet.':p==='denied'?'Blocked. Turn them on in your browser settings for this site.':'Not supported on this browser.'}</p>${p==='default'?'<button class="btn pri" data-s="perm">Allow notifications</button>':''}
+<h3>Notifications</h3><p class="hint" style="margin-top:0">${p==='granted'?'Allowed.':p==='default'?'Not allowed yet.':p==='denied'?'Blocked. Turn them on in your browser settings for this site.':'Not supported on this browser.'}</p>${p==='default'?'<button class="btn pri" data-s="perm">Allow notifications</button>':''}<span class="lbl">Try it</span><div class="acts"><button class="btn" data-t="now">Send a test now</button><button class="btn" data-t="min">Test in 1 minute</button></div><p class="hint">For the one-minute test, close the app and wait. If it doesn't arrive, your phone stopped the app, which is the limit explained in the Guide.</p>
 <div class="acts" style="margin-top:16px">${CLOSE}</div>`)}
 
 function setAlert(m){
@@ -194,6 +254,7 @@ function saveForm(){
   let it=cur&&find(cur);
   if(!it){it={id:Date.now().toString(36),since:Date.now()};S.items.push(it);askPerm()}
   it.name=name;it.note=$('#f-note').value.trim();it.num=$('#f-num')?$('#f-num').value.trim():(it.num||'');delete it.sample;
+  if(cur)clearNote(it.id);
   it.st=turn;tab=turn;save();arm();close();render();toast('Saved')}
 
 function remind(id,m){
@@ -206,7 +267,7 @@ function setRemind(k){
   if(rep){it.st='them';it.since=Date.now();tab='them'}
   if(k==='clear'||k==='none')delete it.remindAt;
   else{it.remindAt=remindAt(k);askPerm()}
-  save();arm();close();render();toast(rep?'Moved to Their turn':k==='clear'?'Reminder cleared':'Reminder set')}
+  clearNote(it.id);save();arm();close();render();toast(rep?'Moved to Their turn':k==='clear'?'Reminder cleared':'Reminder set')}
 
 function examples(){
   const n=Date.now(),h=36e5;
@@ -229,6 +290,7 @@ document.body.addEventListener('click',e=>{
   if(d.s==='examples'){close();return examples()}
   if(d.s==='num'){t.outerHTML='<label class="lbl" for="f-num">WhatsApp number</label><input type="tel" id="f-num" inputmode="tel" placeholder="082 123 4567">';setTimeout(()=>$('#f-num').focus(),0);return}
   if(d.s==='perm'){Promise.resolve(askPerm()).then(settings);return}
+  if(d.t)return testNote(d.t);
   if(d.al!==undefined)return setAlert(+d.al);
   if(d.c){const n=parseFloat($('#'+d.c+'-n').value),m=Math.round(n*+$('#'+d.c+'-u').value);
     if(!(m>0)){toast('Enter a number first');return}
@@ -240,23 +302,25 @@ document.body.addEventListener('click',e=>{
   const a=d.a;if(!a)return;
   if(a==='new')return form();
   if(a==='examples')return examples();
-  if(a==='clear'){S.items=S.items.filter(i=>!i.sample);openId=null;save();arm();return render()}
+  if(a==='clear'){S.items.filter(i=>i.sample).forEach(i=>clearNote(i.id));S.items=S.items.filter(i=>!i.sample);openId=null;save();arm();return render()}
   const box=t.closest('.row'),id=box&&box.dataset.id,it=find(id);
   if(!it)return;
   if(a==='toggle'){openId=openId===id?null:id;return render()}
   if(a==='edit')return form(id);
   if(a==='remind')return remind(id);
   if(a==='replied')return remind(id,'replied');
-  if(a==='theyreplied'){it.st='me';it.since=Date.now();delete it.remindAt;delete it.alerted;tab='me';openId=null;save();arm();render();return toast('Moved to Your turn')}
+  if(a==='theyreplied'){it.st='me';it.since=Date.now();delete it.remindAt;delete it.alerted;tab='me';openId=null;clearNote(id);save();arm();render();return toast('Moved to Your turn')}
   if(a==='wa'){let n=(it.num||'').replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);else if(n.startsWith('0'))n='27'+n.slice(1);window.open('https://wa.me/'+n,'_blank');return}
-  if(a==='done'){const at=S.items.indexOf(it);S.items.splice(at,1);openId=null;save();arm();render();
-    toast(it.name+' is done',()=>{S.items.splice(Math.min(at,S.items.length),0,it);save();arm();render()})}});
+  if(a==='done')return finish(it)});
 ov.addEventListener('click',e=>{if(e.target===ov)close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){arm();render()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){S.lastOpen=Date.now();save()}else{awayCheck();arm();render()}});
+if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.type==='open')openFromNote(d.id);else if(d.type==='done')doneFromNote(d.id)});
 setInterval(render,6e4);
-render();arm();
+awayCheck();render();arm();
 if(!S.seen)welcome();
+(function(){const q=new URLSearchParams(location.search),o=q.get('open'),dn=q.get('done');
+  if(o||dn){try{history.replaceState(null,'',location.pathname)}catch(e){}if(o)openFromNote(o);if(dn)doneFromNote(dn)}})();
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('service-worker.js').catch(()=>{});
 </script>
 </body>
